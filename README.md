@@ -1,22 +1,20 @@
 # $EVOLVE — Your Meme Evolves
 
-Parody meme coin site. Everyone starts with the same egg; simulated wallet activity decides how it evolves (Egg → Goblin → Degenerate → Whale → rare Level 5 form).
+Parody meme coin site. Everyone hatches the same pink egg; simulated wallet activity decides how it evolves: Egg, Goblin, Degenerate, Whale, then a weighted roll for one of six Level 5 "chase" forms.
 
 Static site served by Cloudflare Workers (static assets). No real wallet connection; progress is stored in the visitor's browser.
 
 ## Deploy
 
-**Option A: Cloudflare dashboard (no terminal needed)**
-1. Cloudflare dashboard → Workers & Pages → Create → Import a repository.
-2. Pick `runner14runner-crypto/evolve`. Deploy command: `npx wrangler deploy` (default). No build command.
+**Cloudflare dashboard (no terminal needed)**
+1. Workers & Pages → Create → Import a repository.
+2. Pick this repo. Leave the build command empty; deploy command `npx wrangler deploy` (default).
 3. Every push to `main` redeploys automatically.
 
-**Option B: CLI**
-```
-npx wrangler login
-npx wrangler deploy
-```
+**CLI:** `npx wrangler login` then `npx wrangler deploy`
 
 ## Files
-- `public/index.html` — the whole site (HTML, CSS, JS in one file)
+- `public/index.html` — the whole site (HTML, CSS, JS)
+- `public/img/` — creature figures (generated with Higgsfield)
+- `public/fonts/` — Bagel Fat One and Instrument Sans (SIL Open Font License)
 - `wrangler.jsonc` — Worker config pointing at `public/`
