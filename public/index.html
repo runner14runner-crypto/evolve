@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$EVOLVE | Your Meme Evolves</title>
+<meta name="description" content="$EVOLVE: everyone starts as an egg. Your wallet activity decides what it becomes.">
+<style>
+:root{
+  --bg:#0b0c0a; --panel:#13150f; --line:#262a1e; --text:#e9eedd; --muted:#8b937a;
+  --acc:#c6ff3d; --acc2:#ff5ea8; --warn:#ffb03d;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.mono{font-family:var(--mono)}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:10;background:rgba(11,12,10,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-family:var(--mono);font-weight:700;font-size:18px;letter-spacing:.02em}
+.logo span{color:var(--acc)}
+nav ul{display:flex;gap:24px;list-style:none;font-size:14px;color:var(--muted)}
+nav ul a{text-decoration:none}
+nav ul a:hover{color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--acc);background:var(--acc);color:#0b0c0a;font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;cursor:pointer;text-decoration:none;font-family:var(--sans);transition:transform .1s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--muted)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* hero */
+.hero{padding:90px 0 70px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero h1{font-size:clamp(44px,7vw,84px);line-height:.95;letter-spacing:-.03em;font-weight:800}
+.hero h1 em{font-style:normal;color:var(--acc)}
+.hero p{margin:22px 0 30px;font-size:18px;color:var(--muted);max-width:460px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.ca{margin-top:28px;font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ca code{background:var(--panel);border:1px solid var(--line);padding:6px 10px;border-radius:6px;color:var(--text);cursor:pointer}
+.stage-demo{aspect-ratio:1;border:1px solid var(--line);border-radius:24px;background:radial-gradient(circle at 50% 55%,#1c2112 0,var(--panel) 60%);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.stage-demo .critter{font-size:clamp(110px,16vw,170px);line-height:1;transition:transform .4s}
+.stage-demo .lvl{position:absolute;top:18px;left:20px}
+.stage-demo .nm{margin-top:18px;font-family:var(--mono);font-size:15px}
+.dots{position:absolute;bottom:18px;display:flex;gap:6px}
+.dots i{width:22px;height:4px;border-radius:2px;background:var(--line);display:block;transition:background .3s}
+.dots i.on{background:var(--acc)}
+
+/* ticker */
+.ticker{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;font-family:var(--mono);font-size:13px;color:var(--muted);padding:12px 0}
+.ticker div{display:inline-block;animation:scroll 40s linear infinite}
+.ticker b{color:var(--acc);font-weight:400}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+section{padding:90px 0}
+h2{font-size:clamp(30px,4.5vw,46px);letter-spacing:-.02em;line-height:1.05;margin:10px 0 14px}
+.sub{color:var(--muted);max-width:560px}
+
+/* path */
+.path{margin-top:44px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 16px;text-align:center;position:relative}
+.step .e{font-size:52px;line-height:1.2}
+.step h3{font-size:16px;margin-top:10px}
+.step p{font-size:13px;color:var(--muted);margin-top:6px}
+.step .label{font-size:11px}
+.step.q{border-style:dashed;border-color:var(--acc)}
+.step.q .e{filter:blur(6px) grayscale(1)}
+
+/* lab */
+.lab{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:44px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px}
+.connect{display:flex;gap:10px;margin-top:14px}
+.connect input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:10px 16px;color:var(--text);font-family:var(--mono);font-size:13px;min-width:0}
+.connect input:focus{outline:none;border-color:var(--acc)}
+.pet{margin-top:20px;border:1px solid var(--line);border-radius:16px;background:radial-gradient(circle at 50% 60%,#1c2112 0,var(--bg) 70%);padding:30px 20px;text-align:center;position:relative;min-height:290px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pet .critter{font-size:120px;line-height:1;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+.pet .critter.evolving{animation:evo 1.2s ease-in-out}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes evo{0%{transform:scale(1);filter:brightness(1)}40%{transform:scale(.6) rotate(-12deg);filter:brightness(4)}70%{transform:scale(1.25) rotate(8deg);filter:brightness(2)}100%{transform:scale(1);filter:brightness(1)}}
+.pet .pname{font-family:var(--mono);margin-top:14px;font-size:16px}
+.pet .ptag{font-size:13px;color:var(--muted);margin-top:4px}
+.pet .rar{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.pet .lv{position:absolute;top:14px;left:14px}
+.bar{height:8px;background:var(--bg);border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:16px}
+.bar div{height:100%;background:var(--acc);width:0;transition:width .5s}
+.xprow{display:flex;justify-content:space-between;margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.stat{border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{display:block;font-family:var(--mono);font-size:18px;margin-top:2px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.act{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:left;color:var(--text);cursor:pointer;font-family:var(--sans);transition:border-color .15s}
+.act:hover:not(:disabled){border-color:var(--acc)}
+.act:disabled{opacity:.35;cursor:not-allowed}
+.act strong{display:block;font-size:14px}
+.act span{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.log{margin-top:16px;height:150px;overflow:auto;font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg)}
+.log p{padding:3px 0;border-bottom:1px dashed #1d2017}
+.log .g{color:var(--acc)} .log .r{color:var(--acc2)} .log .y{color:var(--warn)}
+.hint{font-size:12px;color:var(--muted);margin-top:12px}
+
+/* forms */
+.forms{margin-top:44px;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.frow{display:grid;grid-template-columns:70px 1.2fr 2fr 110px;gap:16px;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--panel)}
+.frow:last-child{border-bottom:0}
+.frow.head{background:transparent;padding:12px 22px}
+.frow .e{font-size:38px}
+.frow .e.locked{filter:blur(5px) grayscale(1);opacity:.6}
+.frow h4{font-size:16px}
+.frow p{font-size:13px;color:var(--muted)}
+.pill{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid;text-align:center;justify-self:start}
+.c-un{color:#9ad1ff;border-color:#2b4b66}.c-ra{color:var(--acc);border-color:#4a5e17}.c-ep{color:#c49bff;border-color:#4d3670}.c-le{color:var(--warn);border-color:#6b4a14}.c-my{color:var(--acc2);border-color:#6b2448}
+
+/* tokenomics */
+.tok{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
+.tok .card b{display:block;font-size:28px;font-family:var(--mono);margin:6px 0}
+.tok .card p{font-size:13px;color:var(--muted)}
+
+/* faq */
+.faq{margin-top:36px;border-top:1px solid var(--line)}
+details{border-bottom:1px solid var(--line);padding:18px 0}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+summary::after{content:"+";font-family:var(--mono);color:var(--muted)}
+details[open] summary::after{content:"-"}
+details p{color:var(--muted);margin-top:10px;max-width:720px;font-size:15px}
+
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:var(--panel);border:1px solid var(--acc);border-radius:14px;padding:14px 20px;display:flex;gap:14px;align-items:center;z-index:50;transition:transform .35s;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast .e{font-size:34px}
+.toast b{display:block}
+.toast span{font-size:13px;color:var(--muted)}
+
+@media (max-width:860px){
+  nav ul{display:none}
+  .hero{grid-template-columns:1fr;padding-top:50px}
+  .path{grid-template-columns:repeat(2,1fr)}
+  .path .step:last-child{grid-column:span 2}
+  .lab{grid-template-columns:1fr}
+  .tok{grid-template-columns:repeat(2,1fr)}
+  .frow{grid-template-columns:50px 1fr;}
+  .frow p:not(.keep),.frow.head{display:none}
+  .frow .pill{grid-column:2}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">$<span>EVOLVE</span></div>
+    <ul>
+      <li><a href="#path">Evolution</a></li>
+      <li><a href="#lab">Lab</a></li>
+      <li><a href="#forms">Final forms</a></li>
+      <li><a href="#tokenomics">Tokenomics</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a class="btn" href="#lab">Hatch yours</a>
+  </div>
+</nav>
+
+<header class="wrap hero">
+  <div>
+    <div class="label">Your meme evolves</div>
+    <h1>Everyone starts as an <em>egg.</em></h1>
+    <p>Same creature, same start. What it turns into depends entirely on how you trade. Diamond hands, paper hands, rug survivor: your wallet writes its DNA.</p>
+    <div class="ctas">
+      <a class="btn" href="#lab">Hatch your egg</a>
+      <a class="btn ghost" href="#forms">See final forms</a>
+    </div>
+    <div class="ca">CA <code id="ca" title="Click to copy">TBA</code><span id="caMsg"></span></div>
+  </div>
+  <div class="stage-demo" aria-hidden="true">
+    <div class="label lvl" id="demoLvl">Level 1</div>
+    <div class="critter" id="demoCritter">🥚</div>
+    <div class="nm" id="demoName">Egg</div>
+    <div class="dots" id="demoDots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+  </div>
+</header>
+
+<div class="ticker"><div id="ticker"></div></div>
+
+<section id="path">
+  <div class="wrap">
+    <div class="label">The path</div>
+    <h2>Five levels. One of them is a secret.</h2>
+    <p class="sub">XP comes from what your wallet does. Buying, holding and surviving pushes you forward. Panic selling sets you back.</p>
+    <div class="path">
+      <div class="step"><div class="label">Lvl 1</div><div class="e">🥚</div><h3>Egg</h3><p>Fresh wallet. No history. Pure potential.</p></div>
+      <div class="step"><div class="label">Lvl 2</div><div class="e">🐣</div><h3>Goblin</h3><p>First buys in. Already checking the chart every 4 minutes.</p></div>
+      <div class="step"><div class="label">Lvl 3</div><div class="e">🧌</div><h3>Degenerate</h3><p>Has been rugged. Kept going anyway.</p></div>
+      <div class="step"><div class="label">Lvl 4</div><div class="e">👑</div><h3>Whale</h3><p>Moves the chart. Other goblins watch its wallet.</p></div>
+      <div class="step q"><div class="label">Lvl 5</div><div class="e">🐉</div><h3>???</h3><p>Decided by your history. Some forms are 1 in 1,000.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="lab" style="padding-top:20px">
+  <div class="wrap">
+    <div class="label">Evolution lab</div>
+    <h2>Watch yours grow.</h2>
+    <p class="sub">Enter any wallet address (or generate one) to hatch an egg. Make moves, close the tab, come back later. Your creature keeps earning XP while you hold.</p>
+
+    <div class="lab">
+      <div class="card">
+        <div class="label">Wallet</div>
+        <div class="connect">
+          <input id="addr" placeholder="Paste a Solana address" spellcheck="false" autocomplete="off">
+          <button class="btn" id="hatch">Hatch</button>
+        </div>
+        <button class="btn ghost" id="randAddr" style="margin-top:10px;font-size:12px;padding:6px 12px">Generate a test wallet</button>
+        <div class="pet">
+          <div class="label lv" id="pLv">Level 0</div>
+          <div class="rar" id="pRar">Not hatched</div>
+          <div class="critter" id="pCrit">🥚</div>
+          <div class="pname" id="pName">No creature yet</div>
+          <div class="ptag" id="pTag">Hatch an egg to begin.</div>
+        </div>
+        <div class="bar"><div id="xpBar"></div></div>
+        <div class="xprow"><span id="xpNow">0 XP</span><span id="xpNext">Next: 100 XP</span></div>
+      </div>
+
+      <div class="card">
+        <div class="label">Wallet activity</div>
+        <div class="stats">
+          <div class="stat"><span class="label">Bag</span><b id="sBag">0</b></div>
+          <div class="stat"><span class="label">Held</span><b id="sHeld">0m</b></div>
+          <div class="stat"><span class="label">Rugs survived</span><b id="sRug">0</b></div>
+        </div>
+        <div class="actions">
+          <button class="act" data-a="buy" disabled><strong>Buy the dip</strong><span>+25 XP</span></button>
+          <button class="act" data-a="hold" disabled><strong>Diamond hands</strong><span>+40 XP, needs a bag</span></button>
+          <button class="act" data-a="ape" disabled><strong>Ape a new launch</strong><span>+0 to +120 XP, 35% rug</span></button>
+          <button class="act" data-a="sell" disabled><strong>Panic sell</strong><span>-30 XP, paper hands +1</span></button>
+        </div>
+        <div class="log" id="log"><p>Waiting for a wallet...</p></div>
+        <p class="hint">Passive XP: +1 every 10 seconds while your bag is above zero, including time away. Level 5 form is rolled once, using your history as weights.</p>
+        <button class="btn ghost" id="reset" style="margin-top:12px;font-size:12px;padding:6px 12px">Reset creature</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="forms">
+  <div class="wrap">
+    <div class="label">Level 5</div>
+    <h2>Final forms.</h2>
+    <p class="sub">When you hit Level 5 the chain rolls your final form. How you traded shifts the odds. Forms you have not seen stay hidden.</p>
+    <div class="forms" id="formsTable"></div>
+  </div>
+</section>
+
+<section id="tokenomics" style="padding-top:20px">
+  <div class="wrap">
+    <div class="label">Tokenomics</div>
+    <h2>Simple numbers.</h2>
+    <div class="tok">
+      <div class="card"><span class="label">Supply</span><b>1B</b><p>One billion. Not one more.</p></div>
+      <div class="card"><span class="label">Tax</span><b>0/0</b><p>No buy or sell tax. Paper hands are punished in XP only.</p></div>
+      <div class="card"><span class="label">Liquidity</span><b>Burned</b><p>LP tokens sent to the void.</p></div>
+      <div class="card"><span class="label">Team</span><b>0%</b><p>The dev is also an egg.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:20px">
+  <div class="wrap">
+    <div class="label">FAQ</div>
+    <h2>Questions.</h2>
+    <div class="faq">
+      <details><summary>Does this connect to my real wallet?</summary><p>No. The lab is a simulator. It uses the address you type only as a seed for your creature's look and name. Nothing is signed, read from chain, or sent anywhere. Progress is saved in your browser.</p></details>
+      <details><summary>How does XP work?</summary><p>Buying and holding earn XP. Holding a bag earns passive XP over time, even when the tab is closed. Panic selling costs XP and counts against you when your final form is rolled. Aping new launches is high variance.</p></details>
+      <details><summary>How is the Level 5 form chosen?</summary><p>It is a weighted roll. Never selling raises your Diamond Dragon odds. Surviving rugs raises your Phoenix odds. Lots of paper-hand sells push you toward the Ghost. The Dev is 1 in 1,000 no matter what.</p></details>
+      <details><summary>Is $EVOLVE an investment?</summary><p>No. $EVOLVE is a parody meme project made for fun. It has no utility, no roadmap and no expectation of return. Do not buy anything you cannot afford to lose.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div><span class="logo" style="font-size:15px">$<span style="color:var(--acc)">EVOLVE</span></span><br>Parody project. Not financial advice. No real wallet is ever connected.</div>
+    <div class="mono">Your meme evolves.</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"><div class="e" id="tE">🐣</div><div><b id="tT">Evolved!</b><span id="tS"></span></div></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var LEVELS = [
+    {lvl:1, xp:0,    e:"🥚", n:"Egg",        t:"Fresh wallet. Pure potential."},
+    {lvl:2, xp:100,  e:"🐣", n:"Goblin",     t:"Checks the chart every 4 minutes."},
+    {lvl:3, xp:300,  e:"🧌", n:"Degenerate", t:"Rugged before. Kept going."},
+    {lvl:4, xp:700,  e:"👑", n:"Whale",      t:"Moves the chart."},
+    {lvl:5, xp:1500, e:"✨", n:"???",        t:"Final form."}
+  ];
+
+  var FORMS = [
+    {id:"dragon",  e:"🐉", n:"Diamond Dragon", r:"Legendary", c:"c-le", base:4,  d:"Never sold. Not once. Sleeps on a pile of unrealised gains."},
+    {id:"phoenix", e:"🔥", n:"Rug Phoenix",    r:"Epic",      c:"c-ep", base:8,  d:"Rugged so many times it learned to rise from the ashes."},
+    {id:"ghost",   e:"👻", n:"Paper Ghost",    r:"Uncommon",  c:"c-un", base:30, d:"Sold every top too early. Haunts the chart it left."},
+    {id:"alien",   e:"👽", n:"Chart Alien",    r:"Rare",      c:"c-ra", base:20, d:"Nobody understands its entries. They work anyway."},
+    {id:"robot",   e:"🤖", n:"MEV Bot",        r:"Rare",      c:"c-ra", base:20, d:"Clicks faster than humans. Possibly not a human."},
+    {id:"dev",     e:"🧙", n:"The Dev",        r:"Mythic",    c:"c-my", base:0,  d:"1 in 1,000. Holds the keys to everything. Nobody has seen it move."}
+  ];
+
+  var KEY = "evolve_v1";
+  var PASSIVE_MS = 10000;
+  var state = null;
+
+  function load(){ try{ var s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function seen(){ try{ return JSON.parse(localStorage.getItem(KEY+"_seen")||"[]"); }catch(e){ return []; } }
+  function markSeen(id){ var s = seen(); if(s.indexOf(id)<0){ s.push(id); try{ localStorage.setItem(KEY+"_seen", JSON.stringify(s)); }catch(e){} } }
+
+  function $(id){ return document.getElementById(id); }
+  function hash(str){ var h=2166136261; for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+
+  var ADJ = ["Feral","Sleepy","Based","Crusty","Shiny","Unhinged","Lucky","Greasy","Cosmic","Damp","Turbo","Haunted"];
+  var NOUN = ["Bagholder","Ape","Wick","Pump","Moon","Candle","Jeet","Chad","Gremlin","Floor","Sniper","Dip"];
+
+  function newState(addr){
+    var h = hash(addr);
+    return { addr:addr, name:ADJ[h%ADJ.length]+" "+NOUN[(h>>>8)%NOUN.length], hue:h%360,
+      xp:0, bag:0, rugs:0, sells:0, buys:0, apes:0, heldMs:0, lastTick:Date.now(), form:null, log:[] };
+  }
+
+  function levelOf(xp){ var L=LEVELS[0]; for(var i=0;i<LEVELS.length;i++){ if(xp>=LEVELS[i].xp) L=LEVELS[i]; } return L; }
+
+  function rollForm(){
+    if(Math.random() < 0.001) return "dev";
+    var w = {};
+    FORMS.forEach(function(f){ w[f.id]=f.base; });
+    if(state.sells===0) w.dragon += 30;
+    w.phoenix += state.rugs*6;
+    w.ghost += state.sells*8;
+    w.robot += Math.max(0, state.buys-10)*2;
+    w.alien += state.apes*2;
+    var total=0, k; for(k in w) total+=w[k];
+    var r=Math.random()*total;
+    for(k in w){ r-=w[k]; if(r<=0) return k; }
+    return "alien";
+  }
+
+  function addLog(msg, cls){
+    state.log.unshift({m:msg,c:cls||""});
+    state.log = state.log.slice(0,40);
+  }
+
+  function gain(dx){
+    var before = levelOf(state.xp).lvl;
+    state.xp = Math.max(0, state.xp + dx);
+    var after = levelOf(state.xp).lvl;
+    if(after > before){
+      if(after===5 && !state.form){
+        state.form = rollForm();
+        var f = FORMS.filter(function(x){return x.id===state.form;})[0];
+        markSeen(f.id);
+        addLog("FINAL FORM: "+f.n+" ("+f.r+")","y");
+        toast(f.e, "Final form unlocked", f.n+" · "+f.r);
+      } else {
+        var L = levelOf(state.xp);
+        addLog("Evolved to "+L.n+" (Lvl "+L.lvl+")","g");
+        toast(L.e, "Evolved!", "Your creature is now a "+L.n+".");
+      }
+      var c=$("pCrit"); c.classList.remove("evolving"); void c.offsetWidth; c.classList.add("evolving");
+    }
+  }
+
+  function tickPassive(){
+    if(!state) return;
+    var now = Date.now(), dt = now - state.lastTick;
+    if(state.bag > 0 && dt >= PASSIVE_MS){
+      var n = Math.floor(dt / PASSIVE_MS);
+      state.heldMs += n*PASSIVE_MS;
+      state.lastTick += n*PASSIVE_MS;
+      if(n > 30) addLog("Welcome back. Held through "+fmtTime(n*PASSIVE_MS)+": +"+n+" XP","g");
+      gain(n);
+    } else if(state.bag <= 0){ state.lastTick = now; }
+    save(); render();
+  }
+
+  function fmtTime(ms){
+    var m = Math.floor(ms/60000);
+    if(m < 60) return m+"m";
+    var h = Math.floor(m/60); if(h < 48) return h+"h "+(m%60)+"m";
+    return Math.floor(h/24)+"d";
+  }
+
+  function act(a){
+    if(!state) return;
+    if(a==="buy"){ state.bag+=1; state.buys+=1; addLog("Bought the dip. Bag: "+state.bag,"g"); gain(25); }
+    else if(a==="hold"){ addLog("Diamond hands. Chart did nothing. Neither did you.","g"); gain(40); }
+    else if(a==="ape"){
+      state.apes+=1;
+      if(Math.random()<0.35){ state.rugs+=1; state.bag=Math.max(0,state.bag-1); addLog("Aped in. Got rugged. Survived. Rugs: "+state.rugs,"r"); gain(15); }
+      else { var x = Math.floor(Math.random()*121); state.bag+=1; addLog("Aped in. Sent it. +"+x+" XP","g"); gain(x); }
+    }
+    else if(a==="sell"){ state.bag=Math.max(0,state.bag-1); state.sells+=1; addLog("Panic sold. It pumped 5 minutes later.","r"); gain(-30); }
+    save(); render();
+  }
+
+  function render(){
+    var acts = document.querySelectorAll(".act");
+    if(!state){
+      acts.forEach(function(b){ b.disabled=true; });
+      return;
+    }
+    var L = levelOf(state.xp), f = null;
+    if(L.lvl===5 && state.form) f = FORMS.filter(function(x){return x.id===state.form;})[0];
+    $("pLv").textContent = "Level "+L.lvl;
+    $("pCrit").textContent = f ? f.e : L.e;
+    $("pCrit").style.filter = "drop-shadow(0 0 24px hsla("+state.hue+",90%,60%,.45))";
+    $("pName").textContent = state.name+" the "+(f ? f.n : L.n);
+    $("pTag").textContent = f ? f.d : L.t;
+    $("pRar").textContent = f ? f.r : (state.addr.slice(0,4)+"..."+state.addr.slice(-4));
+    $("pRar").className = "rar"+(f?" pill "+f.c:"");
+    var next = LEVELS.filter(function(x){return x.xp>state.xp;})[0];
+    var pct = next ? ((state.xp - L.xp)/(next.xp - L.xp))*100 : 100;
+    $("xpBar").style.width = pct+"%";
+    $("xpNow").textContent = state.xp+" XP";
+    $("xpNext").textContent = next ? "Next: "+next.xp+" XP" : "Max level";
+    $("sBag").textContent = state.bag;
+    $("sHeld").textContent = fmtTime(state.heldMs);
+    $("sRug").textContent = state.rugs;
+    acts.forEach(function(b){
+      var a=b.getAttribute("data-a");
+      b.disabled = (a==="hold"||a==="sell") ? state.bag<=0 : false;
+    });
+    $("log").innerHTML = state.log.map(function(l){ return '<p class="'+l.c+'">&gt; '+esc(l.m)+'</p>'; }).join("") || "<p>No activity yet.</p>";
+    renderForms();
+  }
+
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+
+  function renderForms(){
+    var s = seen();
+    var odds = {dragon:"~2%",phoenix:"~5%",ghost:"~30%",alien:"~25%",robot:"~25%",dev:"0.1%"};
+    var html = '<div class="frow head"><span class="label"></span><span class="label">Form</span><span class="label">Lore</span><span class="label">Base odds</span></div>';
+    FORMS.slice().sort(function(a,b){return rankOf(b)-rankOf(a);}).forEach(function(f){
+      var known = s.indexOf(f.id)>=0;
+      html += '<div class="frow"><div class="e'+(known?"":" locked")+'">'+f.e+'</div><div><h4>'+(known?f.n:"Undiscovered")+'</h4><p class="keep">'+f.r+'</p></div><p>'+(known?f.d:"Reach Level 5 with this form to reveal it.")+'</p><span class="pill '+f.c+'">'+odds[f.id]+'</span></div>';
+    });
+    $("formsTable").innerHTML = html;
+  }
+  function rankOf(f){ return {Mythic:5,Legendary:4,Epic:3,Rare:2,Uncommon:1}[f.r]; }
+
+  function toast(e,t,s){
+    $("tE").textContent=e; $("tT").textContent=t; $("tS").textContent=s;
+    var el=$("toast"); el.classList.add("show");
+    clearTimeout(toast._t); toast._t=setTimeout(function(){ el.classList.remove("show"); },3200);
+  }
+
+  function randAddr(){
+    var a="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz", s="";
+    for(var i=0;i<44;i++) s+=a[Math.floor(Math.random()*a.length)];
+    return s;
+  }
+
+  /* wiring */
+  $("randAddr").onclick = function(){ $("addr").value = randAddr(); };
+  $("hatch").onclick = function(){
+    var v = $("addr").value.trim();
+    if(v.length < 8){ $("addr").focus(); $("addr").placeholder="Enter at least 8 characters"; return; }
+    if(state && state.addr===v) return;
+    state = newState(v);
+    addLog("Egg hatched for "+v.slice(0,4)+"..."+v.slice(-4)+". Meet "+state.name+".","g");
+    save(); render();
+  };
+  $("reset").onclick = function(){ state=null; try{ localStorage.removeItem(KEY); }catch(e){}
+    $("pLv").textContent="Level 0"; $("pCrit").textContent="🥚"; $("pName").textContent="No creature yet"; $("pTag").textContent="Hatch an egg to begin.";
+    $("pRar").textContent="Not hatched"; $("pRar").className="rar"; $("xpBar").style.width="0"; $("xpNow").textContent="0 XP"; $("xpNext").textContent="Next: 100 XP";
+    $("sBag").textContent="0"; $("sHeld").textContent="0m"; $("sRug").textContent="0"; $("log").innerHTML="<p>Waiting for a wallet...</p>"; render(); };
+  document.querySelectorAll(".act").forEach(function(b){ b.onclick=function(){ act(b.getAttribute("data-a")); }; });
+  $("ca").onclick = function(){
+    try{ navigator.clipboard.writeText($("ca").textContent); $("caMsg").textContent="Copied"; }catch(e){ $("caMsg").textContent="Copy failed"; }
+    setTimeout(function(){ $("caMsg").textContent=""; },1500);
+  };
+
+  /* hero demo */
+  var di = 0, demo = LEVELS.slice(0,4).concat([{lvl:5,e:"🐉",n:"Diamond Dragon"}]);
+  setInterval(function(){
+    di = (di+1)%demo.length;
+    var d = demo[di], c = $("demoCritter");
+    c.style.transform="scale(.6)";
+    setTimeout(function(){ c.textContent=d.e; $("demoName").textContent=d.n; $("demoLvl").textContent="Level "+d.lvl; c.style.transform="scale(1)"; },200);
+    document.querySelectorAll("#demoDots i").forEach(function(x,i){ x.classList.toggle("on", i<=di); });
+  }, 1800);
+
+  /* ticker */
+  var feed = [], names=["7xKp","Bq9z","HzD4","9vRm","Fw2L","CkT8","Ae5n","Mm3Q"];
+  for(var i=0;i<16;i++){
+    var n=names[i%names.length]+"..."+names[(i*3)%names.length].toLowerCase();
+    var ev=[["evolved to <b>Goblin</b>"],["evolved to <b>Degenerate</b>"],["evolved to <b>Whale</b>"],["unlocked <b>Paper Ghost</b>"],["unlocked <b>Rug Phoenix</b>"],["survived a rug"]][i%6][0];
+    feed.push(n+" "+ev);
+  }
+  var t = feed.join("&nbsp;&nbsp;·&nbsp;&nbsp;");
+  $("ticker").innerHTML = t+"&nbsp;&nbsp;·&nbsp;&nbsp;"+t+"&nbsp;&nbsp;·&nbsp;&nbsp;";
+
+  /* boot */
+  state = load();
+  if(state){ $("addr").value = state.addr; tickPassive(); }
+  render();
+  setInterval(tickPassive, 1000);
+})();
+</script>
+</body>
+</html>
