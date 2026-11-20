@@ -146,6 +146,32 @@ nav .btn{min-height:42px;padding:0 18px;font-size:15px;box-shadow:0 3px 0 var(--
 .log .g{color:var(--sun)} .log .r{color:var(--pink)}
 .note{font-size:14px;color:#cfd4f5}
 
+/* tiers */
+.tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.tier .meta h3{font-size:26px}
+.tier .need{display:block;font-family:var(--display);font-size:22px;margin:8px 0 6px}
+.tier ul{list-style:none;font-size:15px;line-height:1.45}
+.tier li{padding:3px 0}
+.tier li::before{content:"+ ";font-weight:700}
+.tier.top{background:var(--navy);color:var(--cream)}
+.tier.top .lv{background:var(--sun)}
+
+/* connect */
+.gate{display:flex;flex-direction:column;gap:12px}
+.gate p{font-size:15px}
+.wallets{display:grid;gap:10px}
+.wbtn{display:flex;justify-content:space-between;align-items:center;min-height:56px;padding:0 18px;border:3px solid var(--navy);border-radius:16px;background:#fff;color:var(--navy);font:700 16px var(--body);cursor:pointer;text-decoration:none;box-shadow:0 4px 0 var(--navy)}
+.wbtn:hover{background:var(--pink2)}
+.wbtn small{font-weight:500;font-size:13px}
+.who{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.who b{font-family:var(--display);font-weight:400;font-size:24px}
+.tierpill{font:700 13px var(--body);padding:4px 12px;border-radius:999px;border:2px solid var(--navy);background:var(--sun)}
+.preview{border:3px dashed var(--navy);border-radius:20px;padding:14px;margin-top:14px}
+.preview h4{margin-bottom:8px}
+.preview .acts{margin-top:8px}
+.safe{font-size:13px;font-weight:600;margin-top:4px}
+[hidden]{display:none!important}
+
 /* chase */
 .chase{background:var(--pink);border-top:3px solid var(--navy);border-bottom:3px solid var(--navy)}
 .forms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
@@ -185,7 +211,7 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 
 @media (max-width:1000px){
   .stages{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .forms{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forms,.tiers{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:820px){
   nav ul{display:none}
@@ -214,12 +240,13 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
     <a class="brand" href="#top">$EVOLVE</a>
     <ul>
       <li><a href="#stages">Stages</a></li>
+      <li><a href="#tiers">Eggs</a></li>
       <li><a href="#lab">Hatch</a></li>
       <li><a href="#chase">Chase forms</a></li>
       <li><a href="#contents">Contents</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
-    <a class="btn" href="#lab">Hatch yours</a>
+    <a class="btn" href="#lab" id="navCta">Connect wallet</a>
   </div>
 </nav>
 
@@ -227,10 +254,10 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   <div class="in">
     <div>
       <h1><span>Your</span><span>meme</span><span>evolves.</span></h1>
-      <p class="lede">Everyone hatches the same pink egg. Buy, hold, ape and survive, and it grows. Panic sell and it remembers. Level 5 is a mystery box, and some of what's inside is 1 in 1,000.</p>
+      <p class="lede">Connect your wallet and your $EVOLVE bag hatches a creature. Bigger bags crack rarer eggs. Hold and it grows, sell and it remembers. Level 5 is a mystery box, and some of what's inside is 1 in 1,000.</p>
       <div class="ctas">
-        <a class="btn" href="#lab">Hatch your egg</a>
-        <a class="btn alt" href="#chase">See the chase forms</a>
+        <a class="btn" href="#lab">Connect and hatch</a>
+        <a class="btn alt" href="#tiers">See the egg tiers</a>
       </div>
       <div class="ca">Contract <button id="ca" type="button">Announcing soon</button><span id="caMsg" aria-live="polite"></span></div>
     </div>
@@ -253,11 +280,21 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   </div>
 </section>
 
+<section class="band" id="tiers" style="padding-top:0">
+  <div class="in">
+    <div class="head">
+      <h2>Bigger bag.<br>Better egg.</h2>
+      <p class="lede">Your egg is set by how much $EVOLVE your wallet holds, checked live. Buy more and it upgrades. Sell below a tier and it drops back.</p>
+    </div>
+    <div class="tiers" id="tierCards"></div>
+  </div>
+</section>
+
 <section class="band lab" id="lab">
   <div class="in">
     <div class="head">
       <h2>Hatch yours.</h2>
-      <p class="lede">Drop in any wallet address to hatch an egg. Make moves, close the tab, come back tomorrow. Your creature keeps growing while you hold.</p>
+      <p class="lede">Connect a Solana wallet holding $EVOLVE. Your creature grows every minute you hold, and real buys and sells change it. Close the tab and come back tomorrow.</p>
     </div>
     <div class="labgrid">
       <div class="case">
@@ -277,29 +314,44 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
       </div>
 
       <div class="panel">
-        <div class="box">
-          <h4>Wallet</h4>
-          <form class="row" id="hatchForm">
-            <input id="addr" placeholder="Paste a Solana address" spellcheck="false" autocomplete="off" aria-label="Wallet address">
-            <button class="btn" type="submit">Hatch</button>
-          </form>
-          <button class="linkbtn" id="randAddr" type="button">No wallet handy? Use a test one</button>
+        <!-- not connected -->
+        <div class="box gate" id="gate">
+          <h4>Connect a wallet to hatch</h4>
+          <div class="wallets" id="walletList"></div>
+          <p class="safe">Read-only. We only look up your $EVOLVE balance. You will never be asked to sign a transaction or approve anything.</p>
+          <button class="linkbtn" id="demoBtn" type="button" hidden>Token not live yet: preview with a demo wallet</button>
         </div>
-        <div class="box">
-          <div class="stats">
-            <div class="stat"><span>Bag</span><b id="sBag">0</b></div>
+
+        <!-- connected -->
+        <div class="box" id="dash" hidden>
+          <div class="who">
+            <div><span style="font-size:13px;font-weight:600">Connected</span><br><b id="wAddr">…</b></div>
+            <span class="tierpill" id="wTier">No egg</span>
+          </div>
+          <div class="stats" style="margin-top:14px">
+            <div class="stat"><span>$EVOLVE held</span><b id="sBag">0</b></div>
             <div class="stat"><span>Time held</span><b id="sHeld">0m</b></div>
-            <div class="stat"><span>Rugs survived</span><b id="sRug">0</b></div>
+            <div class="stat"><span>XP boost</span><b id="sMult">1x</b></div>
           </div>
-          <div class="acts">
-            <button class="act" data-a="buy" disabled><strong>Buy the dip</strong><span>+25 XP</span></button>
-            <button class="act" data-a="hold" disabled><strong>Diamond hands</strong><span>+40 XP, needs a bag</span></button>
-            <button class="act" data-a="ape" disabled><strong>Ape a fresh launch</strong><span>Up to +120 XP, 35% rug chance</span></button>
-            <button class="act bad" data-a="sell" disabled><strong>Panic sell</strong><span>-30 XP, it will remember</span></button>
+          <div id="emptyBag" hidden style="margin-top:14px">
+            <p style="font-weight:600;margin-bottom:10px">This wallet has no $EVOLVE, so there's nothing to hatch yet.</p>
+            <a class="btn" id="buyLink" href="https://pump.fun" target="_blank" rel="noopener">Buy on pump.fun</a>
           </div>
+          <div class="preview" id="previewBox" hidden>
+            <h4>Preview controls (token not live yet)</h4>
+            <p style="font-size:14px">These fake a balance change so you can see how buys and sells feel.</p>
+            <div class="acts">
+              <button class="act" data-p="250000"><strong>Buy 250K</strong><span>Pink egg range</span></button>
+              <button class="act" data-p="3000000"><strong>Buy 3M</strong><span>Pushes toward Gold</span></button>
+              <button class="act bad" data-p="half"><strong>Sell half</strong><span>Paper hands</span></button>
+              <button class="act" data-p="time"><strong>Skip 6 hours</strong><span>Fast-forward holding</span></button>
+            </div>
+          </div>
+          <button class="linkbtn" id="disconnect" type="button">Disconnect</button>
         </div>
+
         <div class="log" id="log" aria-live="polite"><p>Waiting for a wallet.</p></div>
-        <p class="note">Holding a bag earns 1 XP every 10 seconds, including while you're away. Your Level 5 form is rolled once, weighted by everything you did to get there. <button class="linkbtn" id="reset" type="button" style="color:var(--pink);margin:0">Start over</button></p>
+        <p class="note">Every minute you hold earns XP, multiplied by your egg tier, even while you're away. Buys add XP and sells take it. Your Level 5 form is rolled once, weighted by your tier and your history.</p>
       </div>
     </div>
   </div>
@@ -336,9 +388,10 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   <div class="in">
     <h2 style="margin-bottom:34px">Questions.</h2>
     <div class="faq">
-      <details><summary>Does this touch my real wallet?</summary><p>No. The hatchery is a simulator. The address you enter only decides your creature's name. Nothing is signed, read from chain or sent anywhere, and progress lives in your browser.</p></details>
-      <details><summary>How do I earn XP?</summary><p>Buying and diamond-handing earn XP. Holding a bag earns passive XP over time, even with the tab closed. Aping fresh launches is high risk, high reward. Panic selling costs XP and counts against you at Level 5.</p></details>
-      <details><summary>How is my final form picked?</summary><p>It's a weighted roll at Level 5. Never selling boosts the Diamond Dragon. Surviving rugs boosts the Rug Phoenix. Selling a lot pulls you toward the Paper Ghost. The Dev is 1 in 1,000 no matter what you do.</p></details>
+      <details><summary>Is connecting my wallet safe?</summary><p>The site only asks your wallet for its public address, then reads your $EVOLVE balance from the Solana chain. It never requests a signature, a transaction or an approval. If anything claiming to be $EVOLVE ever asks you to sign, close it.</p></details>
+      <details><summary>How do I earn XP?</summary><p>Holding earns XP every minute, multiplied by your egg tier, even with the tab closed. When we see your balance go up, you get a buy bonus. When it goes down, you lose XP and it counts against you at Level 5.</p></details>
+      <details><summary>How is my egg tier decided?</summary><p>By your live balance: any amount gets a Pink egg, 1M gets Silver, 5M gets Gold and 10M (1% of supply) gets Diamond. Higher tiers grow faster and get better Level 5 odds. Drop below a threshold and your tier drops with it.</p></details>
+      <details><summary>How is my final form picked?</summary><p>It's a weighted roll at Level 5. Never selling boosts the Diamond Dragon. Selling and then buying back boosts the Rug Phoenix. Selling a lot pulls you toward the Paper Ghost. The Dev starts at 1 in 1,000, and a Diamond egg raises that to 1 in 200.</p></details>
       <details><summary>Is $EVOLVE an investment?</summary><p>No. It's a parody meme project made for fun, with no utility and no promise of anything. Never put in money you can't afford to lose.</p></details>
     </div>
   </div>
@@ -355,39 +408,63 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 
 <script>
 {
+  /* ===== CONFIG: paste the pump.fun mint address here once the coin is live ===== */
+  const MINT = "";
+  const RPC_RELAY = "/api/rpc";
+  const RPC_PUBLIC = "https://api.mainnet-beta.solana.com";
+  const PREVIEW = !MINT; /* before launch the site runs in preview mode */
+
+  const TIERS = [
+    {id:"pink",    n:"Pink Egg",    min:1,          mult:1,   devOdds:0.001,  dragon:0,  img:"egg",         perks:["Hatches a creature","1x XP"]},
+    {id:"silver",  n:"Silver Egg",  min:1000000,    mult:1.5, devOdds:0.0015, dragon:5,  img:"egg-silver",  perks:["1.5x XP","Slightly better Level 5 odds"]},
+    {id:"gold",    n:"Gold Egg",    min:5000000,    mult:2,   devOdds:0.0025, dragon:10, img:"egg-gold",    perks:["2x XP","Boosted Diamond Dragon odds","The Dev at 1 in 400"]},
+    {id:"diamond", n:"Diamond Egg", min:10000000,   mult:3,   devOdds:0.005,  dragon:20, img:"egg-diamond", perks:["3x XP","Best Diamond Dragon odds","The Dev at 1 in 200"]}
+  ];
   const STAGES = [
-    {lvl:1, xp:0,    img:"egg",    n:"Egg",        t:"Sealed, speckled, full of potential. Something is already wiggling."},
+    {lvl:1, xp:0,    img:null,     n:"Egg",        t:"Sealed, speckled, full of potential. Something is already wiggling."},
     {lvl:2, xp:100,  img:"goblin", n:"Goblin",     t:"First buy in. Checks the chart every four minutes."},
-    {lvl:3, xp:300,  img:"degen",  n:"Degenerate", t:"Has been rugged. Kept clicking anyway."},
+    {lvl:3, xp:300,  img:"degen",  n:"Degenerate", t:"Has been through it. Kept holding anyway."},
     {lvl:4, xp:700,  img:"whale",  n:"Whale",      t:"Moves the chart. Other goblins watch its wallet."},
-    {lvl:5, xp:1500, img:"dragon", n:"???",        t:"Decided by everything you did. Some forms are 1 in 1,000."}
+    {lvl:5, xp:1500, img:"dragon", n:"???",        t:"Decided by your egg and everything you did. Some forms are 1 in 1,000."}
   ];
   const FORMS = [
-    {id:"dev",     img:"dev",     n:"The Dev",        r:"Mythic",    odds:"0.1%", base:0,  d:"Holds the keys to everything. Nobody has ever seen it move."},
-    {id:"dragon",  img:"dragon",  n:"Diamond Dragon", r:"Legendary", odds:"~2%",  base:4,  d:"Never sold. Not once. Sleeps on its unrealised gains."},
-    {id:"phoenix", img:"phoenix", n:"Rug Phoenix",    r:"Epic",      odds:"~5%",  base:8,  d:"Rugged so many times it learned to rise from the ashes."},
-    {id:"alien",   img:"alien",   n:"Chart Alien",    r:"Rare",      odds:"~25%", base:20, d:"Nobody understands its entries. They work anyway."},
-    {id:"robot",   img:"robot",   n:"MEV Bot",        r:"Rare",      odds:"~25%", base:20, d:"Four arms, zero sleep. Possibly not a person."},
-    {id:"ghost",   img:"ghost",   n:"Paper Ghost",    r:"Common",    odds:"~30%", base:30, d:"Sold every top too early. Haunts the chart it left."}
+    {id:"dev",     img:"dev",     n:"The Dev",        r:"Mythic",    odds:"0.1%+", base:0,  d:"Holds the keys to everything. Nobody has ever seen it move."},
+    {id:"dragon",  img:"dragon",  n:"Diamond Dragon", r:"Legendary", odds:"~2%",   base:4,  d:"Never sold. Not once. Sleeps on its unrealised gains."},
+    {id:"phoenix", img:"phoenix", n:"Rug Phoenix",    r:"Epic",      odds:"~5%",   base:8,  d:"Sold, regretted it, came crawling back. Rose from the ashes."},
+    {id:"alien",   img:"alien",   n:"Chart Alien",    r:"Rare",      odds:"~25%",  base:20, d:"Held so long nobody understands it anymore."},
+    {id:"robot",   img:"robot",   n:"MEV Bot",        r:"Rare",      odds:"~25%",  base:20, d:"Buys constantly. Possibly not a person."},
+    {id:"ghost",   img:"ghost",   n:"Paper Ghost",    r:"Common",    odds:"~30%",  base:30, d:"Sold every top too early. Haunts the chart it left."}
   ];
+  const XP_PER_MIN = 1, BUY_XP = 25, SELL_XP = -30, POLL_MS = 30000;
+
   const src = k => "img/" + k + ".jpg";
   const $ = id => document.getElementById(id);
-  const KEY = "evolve_v2", PASSIVE = 10000;
-  let state = null;
-
+  const KEY = "evolve_v3";
   const store = {
     get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
     set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
     del(k){ try{ localStorage.removeItem(k); }catch(e){} }
   };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const short = a => a.slice(0,4) + "…" + a.slice(-4);
+  const fmtNum = n => n >= 1e6 ? (n/1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/,"") + "M" : n >= 1e3 ? Math.round(n/1e3) + "K" : String(Math.floor(n));
+  const tierOf = bal => [...TIERS].reverse().find(t => bal >= t.min) || null;
+  const stageOf = xp => STAGES.filter(s => xp >= s.xp).pop();
+  const formOf = id => FORMS.find(f => f.id === id);
   const seen = () => store.get(KEY+"_seen") || [];
   const markSeen = id => { const s = seen(); if(!s.includes(id)){ s.push(id); store.set(KEY+"_seen", s); } };
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-  /* static content */
+  let wallet = null;   /* {provider, name, addr, demo} */
+  let state = null;    /* per-wallet progress */
+
+  /* ---------- static sections ---------- */
   $("stageCards").innerHTML = STAGES.map(s => s.lvl < 5
-    ? `<article class="card"><div class="blister"><img src="${src(s.img)}" alt="${s.n} stage figure" loading="lazy" width="720" height="720"></div><div class="meta"><span class="lv">Level ${s.lvl}</span><h3>${s.n}</h3><p>${s.t}</p></div></article>`
+    ? `<article class="card"><div class="blister"><img src="${src(s.img || "egg")}" alt="${s.n} stage figure" loading="lazy" width="720" height="720"></div><div class="meta"><span class="lv">Level ${s.lvl}</span><h3>${s.n}</h3><p>${s.t}</p></div></article>`
     : `<article class="card mystery"><div class="blister frost"><span class="q">?</span><img src="${src("dragon")}" alt="A sealed mystery form" loading="lazy" width="720" height="720"></div><div class="meta"><span class="lv">Level 5</span><h3>???</h3><p>${s.t}</p></div></article>`
+  ).join("");
+
+  $("tierCards").innerHTML = TIERS.map(t =>
+    `<article class="card tier${t.id==="diamond"?" top":""}"><div class="blister"><img src="${src(t.img)}" alt="${t.n}" loading="lazy" width="720" height="720"></div><div class="meta"><span class="lv">${t.id==="pink"?"Any amount":"Hold " + fmtNum(t.min) + "+"}</span><h3>${t.n}</h3><ul>${t.perks.map(p=>`<li>${p}</li>`).join("")}</ul></div></article>`
   ).join("");
 
   function renderForms(){
@@ -398,109 +475,224 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
     }).join("");
   }
 
+  /* ---------- wallets ---------- */
+  function detect(){
+    const w = window, list = [];
+    if(w.phantom?.solana?.isPhantom) list.push({name:"Phantom", p:w.phantom.solana});
+    if(w.solflare?.isSolflare) list.push({name:"Solflare", p:w.solflare});
+    if(w.backpack?.solana) list.push({name:"Backpack", p:w.backpack.solana});
+    else if(w.backpack?.isBackpack) list.push({name:"Backpack", p:w.backpack});
+    if(!list.length && w.solana?.connect) list.push({name:"Solana wallet", p:w.solana});
+    return list;
+  }
+
+  function renderGate(){
+    const list = detect();
+    const mobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    const here = encodeURIComponent(location.href), origin = encodeURIComponent(location.origin);
+    let html = list.map((w,i) => `<button class="wbtn" type="button" data-w="${i}">${esc(w.name)} <small>Detected</small></button>`).join("");
+    if(!list.length){
+      html = mobile
+        ? `<a class="wbtn" href="https://phantom.app/ul/browse/${here}?ref=${origin}">Open in Phantom <small>App</small></a><a class="wbtn" href="https://solflare.com/ul/v1/browse/${here}?ref=${origin}">Open in Solflare <small>App</small></a>`
+        : `<p>No Solana wallet found in this browser.</p><a class="wbtn" href="https://phantom.com/download" target="_blank" rel="noopener">Get Phantom <small>phantom.com</small></a><a class="wbtn" href="https://solflare.com/download" target="_blank" rel="noopener">Get Solflare <small>solflare.com</small></a>`;
+    }
+    $("walletList").innerHTML = html;
+    $("walletList").querySelectorAll("[data-w]").forEach(b => b.addEventListener("click", () => connect(list[+b.dataset.w])));
+    $("demoBtn").hidden = !PREVIEW;
+  }
+
+  async function connect(w, silent){
+    try{
+      const res = await w.p.connect(silent ? {onlyIfTrusted:true} : undefined);
+      const pk = (res && res.publicKey) || w.p.publicKey;
+      if(!pk) throw new Error("No public key");
+      onConnected({provider:w.p, name:w.name, addr:pk.toString(), demo:false});
+      store.set(KEY+"_last", w.name);
+      w.p.on?.("accountChanged", pk2 => { if(pk2) onConnected({provider:w.p, name:w.name, addr:pk2.toString(), demo:false}); else disconnect(); });
+    }catch(e){
+      if(!silent) log0("Connection cancelled or blocked by the wallet.", "r");
+    }
+  }
+
+  function connectDemo(){
+    const a = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"; let s = "Demo";
+    for(let i=0;i<40;i++) s += a[Math.floor(Math.random()*a.length)];
+    onConnected({provider:null, name:"Demo", addr:s, demo:true});
+  }
+
+  async function disconnect(){
+    try{ await wallet?.provider?.disconnect?.(); }catch(e){}
+    wallet = null; state = null; store.del(KEY+"_last");
+    render();
+  }
+
+  /* ---------- balance ---------- */
+  async function rpc(url, method, params){
+    const r = await fetch(url, {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({jsonrpc:"2.0", id:1, method, params})});
+    if(!r.ok) throw new Error("RPC " + r.status);
+    const j = await r.json(); if(j.error) throw new Error(j.error.message || "RPC error");
+    return j.result;
+  }
+  async function fetchBalance(owner){
+    const params = [owner, {mint:MINT}, {encoding:"jsonParsed"}];
+    let res;
+    try{ res = await rpc(RPC_RELAY, "getParsedTokenAccountsByOwner", params); }
+    catch(e){ res = await rpc(RPC_PUBLIC, "getParsedTokenAccountsByOwner", params); }
+    return (res.value || []).reduce((sum, acc) => sum + (acc.account.data.parsed.info.tokenAmount.uiAmount || 0), 0);
+  }
+
+  /* ---------- progress ---------- */
   const ADJ = ["Feral","Sleepy","Based","Crusty","Shiny","Unhinged","Lucky","Greasy","Cosmic","Damp","Turbo","Haunted"];
   const NOUN = ["Bagholder","Wick","Pump","Moonboy","Candle","Jeet","Gremlin","Floor","Sniper","Dipper","Chad","Noodle"];
   function hash(str){ let h = 2166136261; for(const ch of str){ h ^= ch.charCodeAt(0); h = Math.imul(h,16777619); } return h>>>0; }
   function fresh(addr){
     const h = hash(addr);
-    return {addr, name: ADJ[h%ADJ.length]+" "+NOUN[(h>>>8)%NOUN.length], xp:0, bag:0, rugs:0, sells:0, buys:0, apes:0, heldMs:0, last:Date.now(), form:null, log:[]};
+    return {addr, name: ADJ[h%ADJ.length]+" "+NOUN[(h>>>8)%NOUN.length], bal:0, xp:0, buys:0, sells:0, comebacks:0, heldMs:0, last:Date.now(), form:null, hatched:false, log:[]};
   }
-  const stageOf = xp => STAGES.filter(s => xp >= s.xp).pop();
-  const formOf = id => FORMS.find(f => f.id === id);
+  const log = (m,c="") => { if(!state) return; state.log.unshift({m,c}); state.log = state.log.slice(0,40); };
+  const log0 = (m,c="") => { $("log").innerHTML = `<p class="${c}">${esc(m)}</p>` + $("log").innerHTML; };
+  const save = () => { if(state) store.set(KEY+":"+state.addr, state); };
 
-  function roll(){
-    if(Math.random() < 0.001) return "dev";
+  function roll(tier){
+    if(Math.random() < tier.devOdds) return "dev";
     const w = {}; FORMS.forEach(f => w[f.id] = f.base);
-    if(state.sells === 0) w.dragon += 30;
-    w.phoenix += state.rugs * 6;
+    w.dragon += tier.dragon + (state.sells === 0 ? 30 : 0);
+    w.phoenix += state.comebacks * 8;
     w.ghost += state.sells * 8;
-    w.robot += Math.max(0, state.buys - 10) * 2;
-    w.alien += state.apes * 2;
+    w.robot += Math.max(0, state.buys - 5) * 3;
+    w.alien += Math.floor(state.heldMs / 21600000) * 2;
     let r = Math.random() * Object.values(w).reduce((a,b)=>a+b,0);
     for(const k in w){ r -= w[k]; if(r <= 0) return k; }
     return "alien";
   }
 
-  const log = (m,c="") => { state.log.unshift({m,c}); state.log = state.log.slice(0,40); };
-
   function gain(dx){
     const before = stageOf(state.xp).lvl;
-    state.xp = Math.max(0, state.xp + dx);
+    state.xp = Math.max(0, Math.round(state.xp + dx));
     const after = stageOf(state.xp).lvl;
     if(after <= before) return;
+    const tier = tierOf(state.bal) || TIERS[0];
     if(after === 5 && !state.form){
-      state.form = roll(); const f = formOf(state.form); markSeen(f.id);
-      log(`The box opened: ${f.n} (${f.r}).`, "g");
-      toast(f.img, f.n, `${f.r} final form unlocked`);
+      state.form = roll(tier); const f = formOf(state.form); markSeen(f.id);
+      log(`The box opened: ${f.n} (${f.r}).`, "g"); toast(f.img, f.n, `${f.r} final form unlocked`);
     } else {
       const s = stageOf(state.xp);
-      log(`Evolved into a ${s.n}.`, "g");
-      toast(s.img, "Evolved!", `${state.name} is now a ${s.n}.`);
+      log(`Evolved into a ${s.n}.`, "g"); toast(s.img || tier.img, "Evolved!", `${state.name} is now a ${s.n}.`);
     }
     const box = $("pBox"); box.classList.remove("evolving"); void box.offsetWidth; box.classList.add("evolving");
   }
 
-  function fmt(ms){
+  /* apply a new balance reading: credits holding time, then buys/sells */
+  function applyBalance(bal){
+    const now = Date.now();
+    const prevTier = tierOf(state.bal);
+    if(state.bal > 0){
+      const mins = Math.floor((now - state.last) / 60000);
+      if(mins > 0){
+        state.heldMs += mins * 60000; state.last += mins * 60000;
+        const xp = mins * XP_PER_MIN * prevTier.mult;
+        if(mins >= 30) log(`Welcome back. Held for ${fmtTime(mins*60000)}: +${Math.round(xp)} XP.`, "g");
+        gain(xp);
+      }
+    } else state.last = now;
+
+    if(bal > state.bal){
+      const first = !state.hatched;
+      if(state.sells > 0 && state.bal === 0) state.comebacks++;
+      state.buys++;
+      state.bal = bal; state.hatched = true;
+      const t = tierOf(bal);
+      if(first){ log(`${t.n} cracked open. Say hi to ${state.name}.`, "g"); toast(t.img, t.n + " hatched", `${state.name} has arrived.`); }
+      else { log(`Bought in. Bag is now ${fmtNum(bal)}.`, "g"); gain(BUY_XP * t.mult); }
+      if(prevTier && t.id !== prevTier.id && TIERS.indexOf(t) > TIERS.indexOf(prevTier)) { log(`Upgraded to a ${t.n}.`, "g"); toast(t.img, "Egg upgraded", `${t.n}: ${t.mult}x XP`); }
+    } else if(bal < state.bal){
+      state.sells++; state.bal = bal;
+      log(bal === 0 ? "Sold everything. Your creature is waiting for you to come back." : `Sold some. Bag is now ${fmtNum(bal)}.`, "r");
+      gain(SELL_XP);
+      const t = tierOf(bal);
+      if(prevTier && (!t || TIERS.indexOf(t) < TIERS.indexOf(prevTier))) log(t ? `Dropped to a ${t.n}.` : "No bag, no tier.", "r");
+    }
+    save(); render();
+  }
+
+  async function refresh(){
+    if(!wallet || !state) return;
+    if(wallet.demo){ applyBalance(state.bal); return; }
+    try{ applyBalance(await fetchBalance(wallet.addr)); }
+    catch(e){ log("Couldn't reach Solana just now. Retrying shortly.", "r"); render(); }
+  }
+
+  function onConnected(w){
+    wallet = w;
+    state = store.get(KEY+":"+w.addr) || fresh(w.addr);
+    if(!state.log.length) log(`Connected ${short(w.addr)}.`);
+    render();
+    if(!w.demo && PREVIEW) log("Token isn't live yet, so balances are simulated with the preview controls.");
+    if(PREVIEW && w.demo === false) wallet.demo = true;
+    refresh();
+  }
+
+  function previewAct(kind){
+    if(!state) return;
+    if(kind === "time"){ state.last -= 6*3600000; applyBalance(state.bal); return; }
+    if(kind === "half"){ applyBalance(Math.floor(state.bal / 2)); return; }
+    applyBalance(state.bal + Number(kind));
+  }
+
+  function fmtTime(ms){
     const m = Math.floor(ms/60000);
     if(m < 60) return m + "m";
     const h = Math.floor(m/60);
     return h < 48 ? h + "h" : Math.floor(h/24) + "d";
   }
 
-  function tick(){
-    if(!state) return;
-    const now = Date.now(), dt = now - state.last;
-    if(state.bag > 0 && dt >= PASSIVE){
-      const n = Math.floor(dt / PASSIVE);
-      state.heldMs += n * PASSIVE; state.last += n * PASSIVE;
-      if(n > 30) log(`Welcome back. You held for ${fmt(n*PASSIVE)}: +${n} XP.`, "g");
-      gain(n);
-    } else if(state.bag <= 0) state.last = now;
-    store.set(KEY, state); render();
-  }
-
-  function act(a){
-    if(!state) return;
-    if(a === "buy"){ state.bag++; state.buys++; log(`Bought the dip. Bag is now ${state.bag}.`, "g"); gain(25); }
-    if(a === "hold"){ log("Diamond hands. The chart did nothing. Neither did you.", "g"); gain(40); }
-    if(a === "ape"){
-      state.apes++;
-      if(Math.random() < 0.35){ state.rugs++; state.bag = Math.max(0, state.bag-1); log(`Aped in. Got rugged. Survived (${state.rugs} total).`, "r"); gain(15); }
-      else { const x = Math.floor(Math.random()*121); state.bag++; log(`Aped in and it sent. +${x} XP.`, "g"); gain(x); }
-    }
-    if(a === "sell"){ state.bag = Math.max(0, state.bag-1); state.sells++; log("Panic sold. It pumped five minutes later.", "r"); gain(-30); }
-    store.set(KEY, state); render();
-  }
-
+  /* ---------- render ---------- */
   function render(){
-    document.querySelectorAll(".act").forEach(b => {
-      const a = b.dataset.a;
-      b.disabled = !state || ((a === "hold" || a === "sell") && state.bag <= 0);
-    });
     renderForms();
-    if(!state){
-      $("pImg").src = src("egg"); $("pLvNum").textContent = "Lv.0"; $("pLvTxt").textContent = "Unhatched";
-      $("pName").textContent = "Nobody yet"; $("pTag").textContent = "Hatch an egg to meet your creature.";
-      $("pRar").textContent = "Sealed"; $("xpBar").style.width = "0"; $("xpNow").textContent = "0 XP";
-      $("xpNext").textContent = "Next stage at 100 XP"; $("sBag").textContent = "0"; $("sHeld").textContent = "0m"; $("sRug").textContent = "0";
+    const on = !!(wallet && state);
+    $("gate").hidden = on; $("dash").hidden = !on;
+    $("navCta").textContent = on ? short(wallet.addr) : "Connect wallet";
+    if(!on){
+      renderGate();
+      $("pImg").src = src("egg"); $("pImg").alt = "A sealed egg"; $("pBox").classList.add("frost");
+      $("pLvNum").textContent = "Lv.0"; $("pLvTxt").textContent = "Locked";
+      $("pName").textContent = "Connect to hatch"; $("pTag").textContent = "Your $EVOLVE balance decides which egg you crack.";
+      $("pRar").textContent = "Sealed"; $("xpBar").style.width = "0"; $("xpNow").textContent = "0 XP"; $("xpNext").textContent = "Next stage at 100 XP";
       $("log").innerHTML = "<p>Waiting for a wallet.</p>";
       return;
     }
+    const tier = tierOf(state.bal);
+    $("wAddr").textContent = short(wallet.addr) + (wallet.name === "Demo" ? " (demo)" : "");
+    $("wTier").textContent = tier ? tier.n : "No egg";
+    $("sBag").textContent = fmtNum(state.bal);
+    $("sHeld").textContent = fmtTime(state.heldMs);
+    $("sMult").textContent = (tier ? tier.mult : 0) + "x";
+    $("emptyBag").hidden = !!state.bal || PREVIEW;
+    $("previewBox").hidden = !PREVIEW;
+    if(MINT) $("buyLink").href = "https://pump.fun/coin/" + MINT;
+    $("log").innerHTML = state.log.map(l => `<p class="${l.c}">${esc(l.m)}</p>`).join("") || "<p>No activity yet.</p>";
+
+    if(!state.hatched){
+      $("pImg").src = src("egg"); $("pBox").classList.add("frost");
+      $("pLvNum").textContent = "Lv.0"; $("pLvTxt").textContent = "Locked";
+      $("pName").textContent = "Nothing to hatch yet"; $("pTag").textContent = PREVIEW ? "Use the preview controls to fake a buy." : "Buy any amount of $EVOLVE and come back.";
+      $("pRar").textContent = short(wallet.addr); $("xpBar").style.width = "0"; $("xpNow").textContent = "0 XP"; $("xpNext").textContent = "Next stage at 100 XP";
+      return;
+    }
+    $("pBox").classList.remove("frost");
     const s = stageOf(state.xp), f = s.lvl === 5 && state.form ? formOf(state.form) : null;
-    const img = src(f ? f.img : s.img);
+    const img = src(f ? f.img : (s.img || (tier || TIERS[0]).img));
     if(!$("pImg").src.endsWith(img)) $("pImg").src = img;
     $("pImg").alt = f ? f.n : s.n;
     $("pLvNum").textContent = "Lv." + s.lvl;
-    $("pLvTxt").textContent = f ? f.r : s.n;
+    $("pLvTxt").textContent = f ? f.r : (s.lvl === 1 && tier ? tier.n.replace(" Egg","") : s.n);
     $("pName").textContent = `${state.name} the ${f ? f.n : s.n}`;
-    $("pTag").textContent = f ? f.d : s.t;
-    $("pRar").textContent = state.addr.slice(0,4) + "…" + state.addr.slice(-4);
+    $("pTag").textContent = f ? f.d : (state.bal ? s.t : "Sold out. It's waiting for you to come back.");
+    $("pRar").textContent = tier ? tier.n : "No bag";
     const next = STAGES.find(x => x.xp > state.xp);
     $("xpBar").style.width = (next ? (state.xp - s.xp) / (next.xp - s.xp) * 100 : 100) + "%";
     $("xpNow").textContent = state.xp.toLocaleString() + " XP";
     $("xpNext").textContent = next ? `Next stage at ${next.xp.toLocaleString()} XP` : "Final form reached";
-    $("sBag").textContent = state.bag; $("sHeld").textContent = fmt(state.heldMs); $("sRug").textContent = state.rugs;
-    $("log").innerHTML = state.log.map(l => `<p class="${l.c}">${esc(l.m)}</p>`).join("") || "<p>No moves yet.</p>";
   }
 
   let tt;
@@ -509,34 +701,27 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
     $("toast").classList.add("show"); clearTimeout(tt); tt = setTimeout(() => $("toast").classList.remove("show"), 3400);
   }
 
-  function randAddr(){
-    const a = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"; let s = "";
-    for(let i=0;i<44;i++) s += a[Math.floor(Math.random()*a.length)];
-    return s;
-  }
-
-  $("randAddr").addEventListener("click", () => { $("addr").value = randAddr(); $("addr").focus(); });
-  $("hatchForm").addEventListener("submit", e => {
-    e.preventDefault();
-    const v = $("addr").value.trim();
-    if(v.length < 8){ $("addr").placeholder = "Enter at least 8 characters"; $("addr").focus(); return; }
-    if(state && state.addr === v) return;
-    state = fresh(v);
-    log(`Egg hatched for ${v.slice(0,4)}…${v.slice(-4)}. Say hi to ${state.name}.`, "g");
-    store.set(KEY, state); render();
+  /* ---------- wiring ---------- */
+  $("demoBtn").addEventListener("click", connectDemo);
+  $("disconnect").addEventListener("click", disconnect);
+  document.querySelectorAll("[data-p]").forEach(b => b.addEventListener("click", () => previewAct(b.dataset.p)));
+  $("ca").textContent = MINT ? short(MINT) : "Announcing soon";
+  $("ca").addEventListener("click", () => {
+    if(MINT){ try{ navigator.clipboard.writeText(MINT); $("caMsg").textContent = "Copied"; }catch(e){ $("caMsg").textContent = MINT; } }
+    else $("caMsg").textContent = "Not live yet. Only trust this site for the address.";
+    setTimeout(() => $("caMsg").textContent = "", 2600);
   });
-  $("reset").addEventListener("click", () => { state = null; store.del(KEY); $("addr").value = ""; render(); });
-  document.querySelectorAll(".act").forEach(b => b.addEventListener("click", () => act(b.dataset.a)));
-  $("ca").addEventListener("click", () => { $("caMsg").textContent = "Not live yet. Only trust this site for the address."; setTimeout(() => $("caMsg").textContent = "", 2600); });
+  document.addEventListener("visibilitychange", () => { if(!document.hidden) refresh(); });
 
-  const feed = ["7xKp…q9z hatched an egg","Bq9z…hzd evolved into a <em>Goblin</em>","HzD4…9vr survived a rug","9vRm…fw2 evolved into a <em>Degenerate</em>","Fw2L…ck8 pulled <em>Paper Ghost</em>","CkT8…ae5 evolved into a <em>Whale</em>","Ae5n…mm3 pulled <em>Rug Phoenix</em>","Mm3Q…7xk panic sold. Again."];
-  const line = feed.map(x => `<span>${x}</span>`).join("");
+  const line = ["Bigger bag, better egg","Hold to grow","Sell and it remembers","Level 5 is a mystery box","Read-only wallet connect, no signatures"].map(x => `<span>${x}</span>`).join("");
   $("marq").innerHTML = line + line;
 
-  state = store.get(KEY);
-  if(state){ $("addr").value = state.addr; tick(); }
   render();
-  setInterval(tick, 1000);
+  /* reconnect quietly if this wallet was approved before */
+  const last = store.get(KEY+"_last");
+  if(last){ const w = detect().find(x => x.name === last); if(w) setTimeout(() => connect(w, true), 300); }
+  setInterval(refresh, POLL_MS);
+  setInterval(() => { if(state && state.bal > 0) $("sHeld").textContent = fmtTime(state.heldMs + (Date.now() - state.last)); }, 15000);
 }
 </script>
 </body>
