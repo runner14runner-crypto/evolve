@@ -176,6 +176,29 @@ nav .btn{min-height:42px;padding:0 18px;font-size:15px;box-shadow:0 3px 0 var(--
 .safe{font-size:13px;font-weight:600;margin-top:4px}
 [hidden]{display:none!important}
 
+/* live stats */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi{background:#fff;border:3px solid var(--navy);border-radius:22px;padding:18px 20px;box-shadow:5px 5px 0 var(--navy)}
+.kpi span{font-weight:600;font-size:15px}
+.kpi b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(34px,4vw,48px);line-height:1.1;margin-top:4px}
+.kpi small{font-size:13px;font-weight:500}
+.split2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px}
+.split2 .box{background:#fff}
+.brow{display:grid;grid-template-columns:8.5em minmax(0,1fr) 3.5em;gap:12px;align-items:center;padding:6px 0;font-size:15px;font-weight:600}
+.brow .bt{height:16px;border-radius:999px;background:var(--cream);border:2px solid var(--navy);overflow:hidden}
+.brow .bt div{height:100%;background:var(--pink)}
+.brow b{text-align:right;font-variant-numeric:tabular-nums}
+
+/* fees */
+.fees{background:var(--cream);border-top:3px solid var(--navy)}
+.splitbar{display:flex;border:4px solid var(--navy);border-radius:24px;overflow:hidden;min-height:150px;box-shadow:8px 8px 0 var(--navy)}
+.splitbar>div{display:flex;flex-direction:column;justify-content:flex-end;padding:18px 20px;min-width:0}
+.splitbar>div:first-child{background:var(--sun);border-right:4px solid var(--navy)}
+.splitbar>div:last-child{background:var(--pink)}
+.splitbar b{font-family:var(--display);font-weight:400;font-size:clamp(36px,4.5vw,56px);line-height:1}
+.splitbar span{font-weight:700;font-size:15px;margin-top:4px}
+.spec a{color:var(--navy);font-family:var(--body);font-weight:700;font-size:20px}
+
 /* chase */
 .chase{background:var(--pink);border-top:3px solid var(--navy);border-bottom:3px solid var(--navy)}
 .forms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
@@ -215,11 +238,11 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 
 @media (max-width:1000px){
   .stages{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .forms,.tiers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forms,.tiers,.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:820px){
   nav ul{display:none}
-  .hero .in,.labgrid,.label{grid-template-columns:minmax(0,1fr)}
+  .hero .in,.labgrid,.label,.split2{grid-template-columns:minmax(0,1fr)}
   .stages{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:520px){
@@ -247,7 +270,8 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
       <li><a href="#tiers">Eggs</a></li>
       <li><a href="#lab">Hatch</a></li>
       <li><a href="#chase">Chase forms</a></li>
-      <li><a href="#contents">Contents</a></li>
+      <li><a href="#live">Live</a></li>
+      <li><a href="#fees">Fees</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
     <a class="btn" href="#lab" id="navCta">Connect wallet</a>
@@ -351,12 +375,34 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
               <button class="act" data-p="time"><strong>Skip 6 hours</strong><span>Fast-forward holding</span></button>
             </div>
           </div>
-          <button class="linkbtn" id="disconnect" type="button">Disconnect</button>
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:14px">
+            <button class="btn" id="shareBtn" type="button" hidden>Share my creature</button>
+            <button class="linkbtn" id="disconnect" type="button" style="margin:0">Disconnect</button>
+          </div>
         </div>
 
         <div class="log" id="log" aria-live="polite"><p>Waiting for a wallet.</p></div>
         <p class="note">Every minute you hold earns XP, multiplied by your egg tier, even while you're away. Buys add XP and sells take it. Your Level 5 form is rolled once, weighted by your tier and your history.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="live">
+  <div class="in">
+    <div class="head">
+      <h2>Live from<br>the hatchery.</h2>
+      <p class="lede" id="liveNote">These go live the moment $EVOLVE launches.</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span>Creatures hatched</span><b id="kHatched">–</b></div>
+      <div class="kpi"><span>Final forms pulled</span><b id="kFinals">–</b></div>
+      <div class="kpi"><span>Buyback wallet</span><b id="kSol">–</b><small>SOL waiting to buy back</small></div>
+      <div class="kpi"><span>Bought back</span><b id="kTok">–</b><small>$EVOLVE held by the buyback wallet</small></div>
+    </div>
+    <div class="split2">
+      <div class="box"><h4>Eggs by tier</h4><div id="tierBars"></div></div>
+      <div class="box"><h4>Final forms pulled</h4><div id="formBars"></div></div>
     </div>
   </div>
 </section>
@@ -388,14 +434,33 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   </div>
 </section>
 
+<section class="band fees" id="fees">
+  <div class="in label">
+    <div>
+      <h2>Where the<br>fees go.</h2>
+      <p class="lede" style="margin-top:18px">Creator fees from every trade are split on-chain by pump.fun. The split is set once and then locked, so nobody can change it later. Every wallet is public, so you can check the numbers yourself.</p>
+    </div>
+    <div>
+      <div class="splitbar"><div id="fBuy" style="width:70%"><b id="fBuyPct">70%</b><span>Buyback</span></div><div id="fInf" style="width:30%"><b id="fInfPct">30%</b><span>Infrastructure</span></div></div>
+      <div class="spec" style="margin-top:24px">
+        <div class="t">Wallets</div>
+        <div><span>Buyback<br><small style="font-weight:500">Buys $EVOLVE back off the market</small></span><b id="fBuyW">Published at launch</b></div>
+        <div><span>Infrastructure<br><small style="font-weight:500">Hosting and Solana data for the hatchery</small></span><b id="fInfW">Published at launch</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="band" id="faq" style="padding-top:0">
   <div class="in">
     <h2 style="margin-bottom:34px">Questions.</h2>
     <div class="faq">
-      <details><summary>Is connecting my wallet safe?</summary><p>The site only asks your wallet for its public address, then reads your $EVOLVE balance from the Solana chain. It never requests a signature, a transaction or an approval. If anything claiming to be $EVOLVE ever asks you to sign, close it.</p></details>
+      <details><summary>Is connecting my wallet safe?</summary><p>The site only asks your wallet for its public address, then the hatchery reads your $EVOLVE balance from the Solana chain. It never requests a signature, a transaction or an approval. If anything claiming to be $EVOLVE ever asks you to sign, close it.</p></details>
       <details><summary>How do I earn XP?</summary><p>Holding earns XP every minute, multiplied by your egg tier, even with the tab closed. When we see your balance go up, you get a buy bonus. When it goes down, you lose XP and it counts against you at Level 5.</p></details>
       <details><summary>How is my egg tier decided?</summary><p>By your live balance: any amount gets a Pink egg, 1M gets Silver, 5M gets Gold and 10M (1% of supply) gets Diamond. Higher tiers grow faster and get better Level 5 odds. Drop below a threshold and your tier drops with it.</p></details>
       <details><summary>How is my final form picked?</summary><p>It's a weighted roll at Level 5. Never selling boosts the Diamond Dragon. Selling and then buying back boosts the Rug Phoenix. Selling a lot pulls you toward the Paper Ghost. The Dev starts at 1 in 1,000, and a Diamond egg raises that to 1 in 200.</p></details>
+      <details><summary>What does the buyback do?</summary><p>Most of the creator fees go to a public buyback wallet that uses them to buy $EVOLVE off the market. The rest pays for hosting and Solana data. The split is locked on pump.fun and both wallets are listed above. A buyback is not a promise that the price goes up.</p></details>
+      <details><summary>Does my creature follow me to another device?</summary><p>Yes. Progress is stored by the hatchery against your wallet address and worked out from your on-chain balance, so connect the same wallet anywhere and your creature is there.</p></details>
       <details><summary>Is $EVOLVE an investment?</summary><p>No. It's a parody meme project made for fun, with no utility and no promise of anything. Never put in money you can't afford to lose.</p></details>
     </div>
   </div>
@@ -413,10 +478,9 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 <script>
 {
   /* ===== CONFIG: paste the pump.fun mint address here once the coin is live ===== */
-  const MINT = "";
-  const RPC_RELAY = "/api/rpc";
-  const RPC_PUBLIC = "https://api.mainnet-beta.solana.com";
-  const PREVIEW = !MINT; /* before launch the site runs in preview mode */
+  /* Settings come from the Worker (/api/config). Set MINT and the fee wallets in wrangler.jsonc at launch.
+     If the config can't be loaded, or MINT is empty, the site runs in preview mode. */
+  let MINT = "", PREVIEW = true, CFG = {mint:"", buybackWallet:"", infraWallet:"", split:{buyback:70, infra:30}};
 
   const TIERS = [
     {id:"pink",    n:"Pink Egg",    min:1,          mult:1,   devOdds:0.001,  dragon:0,  img:"egg",         perks:["Hatches a creature","1x XP"]},
@@ -530,19 +594,11 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
     render();
   }
 
-  /* ---------- balance ---------- */
-  async function rpc(url, method, params){
-    const r = await fetch(url, {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({jsonrpc:"2.0", id:1, method, params})});
-    if(!r.ok) throw new Error("RPC " + r.status);
-    const j = await r.json(); if(j.error) throw new Error(j.error.message || "RPC error");
-    return j.result;
-  }
-  async function fetchBalance(owner){
-    const params = [owner, {mint:MINT}, {encoding:"jsonParsed"}];
-    let res;
-    try{ res = await rpc(RPC_RELAY, "getParsedTokenAccountsByOwner", params); }
-    catch(e){ res = await rpc(RPC_PUBLIC, "getParsedTokenAccountsByOwner", params); }
-    return (res.value || []).reduce((sum, acc) => sum + (acc.account.data.parsed.info.tokenAmount.uiAmount || 0), 0);
+  /* ---------- server sync (live mode) ---------- */
+  async function serverSync(addr){
+    const r = await fetch("/api/sync", {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({wallet:addr})});
+    if(!r.ok) throw new Error("sync " + r.status);
+    return r.json();
   }
 
   /* ---------- progress ---------- */
@@ -621,19 +677,44 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 
   async function refresh(){
     if(!wallet || !state) return;
-    if(wallet.demo){ applyBalance(state.bal); return; }
-    try{ applyBalance(await fetchBalance(wallet.addr)); }
-    catch(e){ log("Couldn't reach Solana just now. Retrying shortly.", "r"); render(); }
+    if(PREVIEW || wallet.demo){ applyBalance(state.bal); return; }
+    try{
+      const prev = state, next = await serverSync(wallet.addr);
+      if(!wallet || wallet.addr !== next.addr) return;
+      state = next; announce(prev, next); render();
+    }catch(e){
+      if(!state.loading) log("Couldn't reach the hatchery just now. Retrying shortly.", "r");
+      render();
+    }
   }
+
+  /* toasts for changes the server reports */
+  function announce(prev, next){
+    if(prev.loading || !next.hatched) return;
+    const t = tierOf(next.bal) || TIERS[0];
+    if(!prev.hatched){ toast(t.img, t.n + " hatched", `${next.name} has arrived.`); pulse(); return; }
+    const a = stageOf(prev.xp).lvl, b = stageOf(next.xp).lvl;
+    if(b > a){
+      if(b === 5 && next.form){ const f = formOf(next.form); toast(f.img, f.n, `${f.r} final form unlocked`); }
+      else { const s = stageOf(next.xp); toast(s.img || t.img, "Evolved!", `${next.name} is now a ${s.n}.`); }
+      pulse();
+    } else if(prev.tier && TIERS.findIndex(x => x.id === t.id) > TIERS.findIndex(x => x.id === prev.tier)){
+      toast(t.img, "Egg upgraded", `${t.n}: ${t.mult}x XP`);
+    }
+  }
+  function pulse(){ const box = $("pBox"); box.classList.remove("evolving"); void box.offsetWidth; box.classList.add("evolving"); }
 
   function onConnected(w){
     wallet = w;
-    state = store.get(KEY+":"+w.addr) || fresh(w.addr);
-    if(!state.log.length) log(`Connected ${short(w.addr)}.`);
-    render();
-    if(!w.demo && PREVIEW) log("Token isn't live yet, so balances are simulated with the preview controls.");
-    if(PREVIEW && w.demo === false) wallet.demo = true;
-    refresh();
+    if(PREVIEW){
+      const real = !w.demo; wallet.demo = true;
+      state = store.get(KEY+":"+w.addr) || fresh(w.addr);
+      if(!state.log.length) log(`Connected ${short(w.addr)}.`);
+      if(real) log("Token isn't live yet, so balances are simulated with the preview controls.");
+      render(); refresh(); return;
+    }
+    state = Object.assign(fresh(w.addr), {loading:true, log:[{m:"Checking your bag on-chain…", c:""}]});
+    render(); refresh();
   }
 
   function previewAct(kind){
@@ -666,6 +747,8 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
       return;
     }
     const tier = tierOf(state.bal);
+    if(state.form) markSeen(state.form);
+    $("shareBtn").hidden = !state.hatched;
     $("wAddr").textContent = short(wallet.addr) + (wallet.name === "Demo" ? " (demo)" : "");
     $("wTier").textContent = tier ? tier.n : "No egg";
     $("sBag").textContent = fmtNum(state.bal);
@@ -709,7 +792,7 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   $("demoBtn").addEventListener("click", connectDemo);
   $("disconnect").addEventListener("click", disconnect);
   document.querySelectorAll("[data-p]").forEach(b => b.addEventListener("click", () => previewAct(b.dataset.p)));
-  $("ca").textContent = MINT ? short(MINT) : "Announcing soon";
+  const setupCA = () => { $("ca").textContent = MINT ? short(MINT) : "Announcing soon"; };
   $("ca").addEventListener("click", () => {
     if(MINT){ try{ navigator.clipboard.writeText(MINT); $("caMsg").textContent = "Copied"; }catch(e){ $("caMsg").textContent = MINT; } }
     else $("caMsg").textContent = "Not live yet. Only trust this site for the address.";
@@ -720,10 +803,93 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   const line = ["Bigger bag, better egg","Hold to grow","Sell and it remembers","Level 5 is a mystery box","Read-only wallet connect, no signatures"].map(x => `<span>${x}</span>`).join("");
   $("marq").innerHTML = line + line;
 
-  render();
-  /* reconnect quietly if this wallet was approved before */
-  const last = store.get(KEY+"_last");
-  if(last){ const w = detect().find(x => x.name === last); if(w) setTimeout(() => connect(w, true), 300); }
+  $("shareBtn").addEventListener("click", shareCard);
+
+  /* ---------- live stats ---------- */
+  const fmtSol = n => n >= 100 ? Math.round(n).toLocaleString() : n.toFixed(2);
+  function bars(el, rows){
+    const max = Math.max(1, ...rows.map(r => r.n));
+    $(el).innerHTML = rows.map(r => `<div class="brow"><span>${esc(r.label)}</span><div class="bt"><div style="width:${(r.n/max*100).toFixed(1)}%"></div></div><b>${r.n.toLocaleString()}</b></div>`).join("");
+  }
+  async function loadStats(){
+    let s = null;
+    try{ const r = await fetch("/api/stats"); if(r.ok) s = await r.json(); }catch(e){}
+    const live = !!(s && s.live);
+    $("liveNote").textContent = live ? "Pulled from the hatchery and the Solana chain. Refreshes every minute." : "These go live the moment $EVOLVE launches.";
+    $("kHatched").textContent = live ? s.hatched.toLocaleString() : "–";
+    $("kFinals").textContent = live ? s.finals.toLocaleString() : "–";
+    $("kSol").textContent = live && s.buyback ? fmtSol(s.buyback.sol) : "–";
+    $("kTok").textContent = live && s.buyback ? fmtNum(s.buyback.tokens) : "–";
+    bars("tierBars", TIERS.map(t => ({label:t.n, n: live ? (s.tiers[t.id] || 0) : 0})));
+    const seenNow = seen();
+    bars("formBars", FORMS.map(f => ({label: (live && s.forms[f.id]) || seenNow.includes(f.id) ? f.n : "Sealed", n: live ? (s.forms[f.id] || 0) : 0})));
+  }
+
+  /* ---------- fees ---------- */
+  function renderFees(){
+    const sp = CFG.split || {buyback:70, infra:30};
+    $("fBuy").style.width = sp.buyback + "%"; $("fInf").style.width = sp.infra + "%";
+    $("fBuyPct").textContent = sp.buyback + "%"; $("fInfPct").textContent = sp.infra + "%";
+    $("fInf").hidden = !sp.infra; $("fBuy").hidden = !sp.buyback;
+    const w = (id, addr) => { $(id).innerHTML = addr ? `<a href="https://solscan.io/account/${esc(addr)}" target="_blank" rel="noopener">${esc(short(addr))}</a>` : "Published at launch"; };
+    w("fBuyW", CFG.buybackWallet); w("fInfW", CFG.infraWallet);
+  }
+
+  /* ---------- share card ---------- */
+  const loadImg = u => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = u; });
+  function wrap(x, text, maxW){
+    const words = text.split(" "), lines = []; let line = "";
+    for(const wd of words){ const t = line ? line + " " + wd : wd; if(x.measureText(t).width > maxW && line){ lines.push(line); line = wd; } else line = t; }
+    if(line) lines.push(line); return lines;
+  }
+  async function shareCard(){
+    if(!state || !state.hatched) return;
+    const btn = $("shareBtn"); btn.disabled = true; btn.textContent = "Making your card…";
+    try{
+      await Promise.all([document.fonts.load('72px "Bagel Fat One"'), document.fonts.load('700 28px "Instrument Sans"')]);
+      const tier = tierOf(state.bal) || TIERS[0], s = stageOf(state.xp), f = s.lvl === 5 && state.form ? formOf(state.form) : null;
+      const img = await loadImg(src(f ? f.img : (s.img || tier.img)));
+      const c = document.createElement("canvas"); c.width = 1200; c.height = 675;
+      const x = c.getContext("2d");
+      x.fillStyle = "#ff9ec4"; x.fillRect(0, 0, 1200, 675);
+      const box = (X, Y, W, H, r) => { x.beginPath(); x.roundRect(X, Y, W, H, r); };
+      box(84, 84, 520, 520, 36); x.fillStyle = "#111a52"; x.fill();
+      x.save(); box(70, 70, 520, 520, 36); x.clip(); x.drawImage(img, 70, 70, 520, 520); x.restore();
+      box(70, 70, 520, 520, 36); x.lineWidth = 6; x.strokeStyle = "#111a52"; x.stroke();
+      x.fillStyle = "#111a52";
+      x.font = '700 28px "Instrument Sans"'; x.fillText(`Level ${s.lvl} · ${tier.n}`, 650, 130);
+      x.font = '72px "Bagel Fat One"';
+      const lines = wrap(x, state.name, 500).concat(wrap(x, "the " + (f ? f.n : s.n), 500)).slice(0, 4);
+      lines.forEach((l, i) => x.fillText(l, 650, 215 + i * 74));
+      x.font = '700 28px "Instrument Sans"';
+      x.fillText(`${state.xp.toLocaleString()} XP · held ${fmtTime(state.heldMs)}`, 650, 215 + lines.length * 74 + 10);
+      if(f){ box(650, 470 - 46, 230, 54, 27); x.fillStyle = "#ffd43b"; x.fill(); x.lineWidth = 4; x.stroke(); x.fillStyle = "#111a52"; x.fillText(f.r, 672, 470 - 9); }
+      x.font = '54px "Bagel Fat One"'; x.fillText("$EVOLVE", 650, 590);
+      x.font = '700 24px "Instrument Sans"'; x.fillText(location.host || "Your meme evolves.", 652, 625);
+      const blob = await new Promise(ok => c.toBlob(ok, "image/png"));
+      const file = new File([blob], "my-evolve-creature.png", {type:"image/png"});
+      const text = `My ${state.name} is a Level ${s.lvl} ${f ? f.n : s.n} on a ${tier.n}. Your meme evolves. $EVOLVE ${location.origin}`;
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file], text}); }catch(e){}
+      } else {
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+        window.open("https://x.com/intent/post?text=" + encodeURIComponent(text), "_blank", "noopener");
+        log("Card saved. Attach it to your post on X.", "g"); render();
+      }
+    }catch(e){ log("Couldn't make the card. Try again.", "r"); render(); }
+    btn.disabled = false; btn.textContent = "Share my creature";
+  }
+
+  /* ---------- start ---------- */
+  (async () => {
+    try{ const r = await fetch("/api/config"); if(r.ok){ CFG = await r.json(); MINT = CFG.mint || ""; } }catch(e){}
+    PREVIEW = !MINT;
+    setupCA(); renderFees(); render(); loadStats();
+    setInterval(loadStats, 60000);
+    /* reconnect quietly if this wallet was approved before */
+    const last = store.get(KEY+"_last");
+    if(last){ const w = detect().find(x => x.name === last); if(w) setTimeout(() => connect(w, true), 300); }
+  })();
   setInterval(refresh, POLL_MS);
   setInterval(() => { if(state && state.bal > 0) $("sHeld").textContent = fmtTime(state.heldMs + (Date.now() - state.last)); }, 15000);
 }

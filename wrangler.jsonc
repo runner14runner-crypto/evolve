@@ -7,5 +7,16 @@
     "directory": "./public",
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
-  }
+  },
+  // Fill these in at launch, then push. Empty MINT keeps the site in preview mode.
+  "vars": {
+    "MINT": "",
+    "BUYBACK_WALLET": "",
+    "INFRA_WALLET": "",
+    "BUYBACK_PCT": "70"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "HATCHERY", "class_name": "Hatchery" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Hatchery"] }]
 }

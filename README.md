@@ -9,8 +9,14 @@ The site never asks for a signature or transaction. Progress is stored in the vi
 
 ## Going live
 
-1. **Set the mint.** In `public/index.html`, find `const MINT = "";` and paste the pump.fun mint address. While it's empty the site runs in preview mode (demo wallet + fake buy/sell buttons).
-2. **(Recommended) Add an RPC key.** The public Solana RPC is rate-limited. Get a free key from Helius (or similar), then in Cloudflare: Worker → Settings → Variables and Secrets → add secret `SOLANA_RPC_URL` = `https://mainnet.helius-rpc.com/?api-key=YOUR_KEY`. The Worker at `/api/rpc` uses it and only allows balance lookups.
+1. **Set the config** in `wrangler.jsonc` under `vars`: `MINT` (the pump.fun mint), `BUYBACK_WALLET`, `INFRA_WALLET`, and `BUYBACK_PCT` (default 70). Push. Empty `MINT` keeps the site in preview mode.
+2. **Add an RPC key.** Get a free Helius key, then in Cloudflare: Worker → Settings → Variables and Secrets → secret `SOLANA_RPC_URL` = `https://mainnet.helius-rpc.com/?api-key=YOUR_KEY`. The public RPC is rate-limited.
+3. **pump.fun fees:** choose Creator Fees (not Cashback) at creation, then set fee sharing to the two wallets above. pump.fun allows one post-launch change, then locks it.
+
+## How live mode works
+- `/api/sync` reads a wallet's balance on-chain and updates its creature in a SQLite Durable Object (`Hatchery`). XP is decided server-side, so progress follows the wallet across devices and can't be edited in the browser.
+- `/api/stats` returns creatures hatched, tier counts, final forms pulled and the buyback wallet's SOL / $EVOLVE balance.
+- Game rules live in `src/game.js`; keep them in step with the lists in `public/index.html`.
 
 ## Deploy
 
@@ -25,5 +31,6 @@ The site never asks for a signature or transaction. Progress is stored in the vi
 - `public/index.html` — the site (HTML, CSS, JS)
 - `public/img/` — creature and egg figures (generated with Higgsfield)
 - `public/fonts/` — Bagel Fat One and Instrument Sans (SIL Open Font License)
-- `src/index.js` — Worker: serves the site and the read-only `/api/rpc` relay
+- `src/index.js` — Worker: site, `/api/config`, `/api/sync`, `/api/stats`, and the Hatchery Durable Object
+- `src/game.js` — XP, tiers and Level 5 roll
 - `wrangler.jsonc` — Worker config
