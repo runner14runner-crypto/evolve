@@ -404,6 +404,10 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
       <div class="box"><h4>Eggs by tier</h4><div id="tierBars"></div></div>
       <div class="box"><h4>Final forms pulled</h4><div id="formBars"></div></div>
     </div>
+    <div style="margin-top:22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <button class="btn" id="statsBtn" type="button" disabled>Share hatchery stats</button>
+      <span id="statsMsg" style="font-size:14px;font-weight:600"></span>
+    </div>
   </div>
 </section>
 
@@ -811,10 +815,12 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
     const max = Math.max(1, ...rows.map(r => r.n));
     $(el).innerHTML = rows.map(r => `<div class="brow"><span>${esc(r.label)}</span><div class="bt"><div style="width:${(r.n/max*100).toFixed(1)}%"></div></div><b>${r.n.toLocaleString()}</b></div>`).join("");
   }
+  let lastStats = null;
   async function loadStats(){
     let s = null;
     try{ const r = await fetch("/api/stats"); if(r.ok) s = await r.json(); }catch(e){}
     const live = !!(s && s.live);
+    lastStats = live ? s : null; $("statsBtn").disabled = !live;
     $("liveNote").textContent = live ? "Pulled from the hatchery and the Solana chain. Refreshes every minute." : "These go live the moment $EVOLVE launches.";
     $("kHatched").textContent = live ? s.hatched.toLocaleString() : "–";
     $("kFinals").textContent = live ? s.finals.toLocaleString() : "–";
@@ -879,6 +885,50 @@ footer .fine{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
     }catch(e){ log("Couldn't make the card. Try again.", "r"); render(); }
     btn.disabled = false; btn.textContent = "Share my creature";
   }
+
+  /* ---------- hatchery stats card ---------- */
+  async function shareStats(){
+    const s = lastStats; if(!s) return;
+    const btn = $("statsBtn"); btn.disabled = true; btn.textContent = "Making the card…";
+    try{
+      await Promise.all([document.fonts.load('72px "Bagel Fat One"'), document.fonts.load('700 28px "Instrument Sans"')]);
+      const c = document.createElement("canvas"); c.width = 1200; c.height = 675; const x = c.getContext("2d");
+      const box = (X, Y, W, H, r) => { x.beginPath(); x.roundRect(X, Y, W, H, r); };
+      x.fillStyle = "#111a52"; x.fillRect(0, 0, 1200, 675);
+      x.fillStyle = "#ff9ec4"; x.font = '64px "Bagel Fat One"'; x.fillText("Hatchery update", 60, 110);
+      x.fillStyle = "#cfd4f5"; x.font = '700 24px "Instrument Sans"';
+      x.fillText(new Date().toLocaleDateString(undefined, {day:"numeric", month:"short", year:"numeric"}), 60, 150);
+      const kp = [["Creatures hatched", s.hatched.toLocaleString()], ["Final forms pulled", s.finals.toLocaleString()],
+                  ["Buyback wallet", s.buyback ? fmtSol(s.buyback.sol) + " SOL" : "–"]];
+      kp.forEach((k, i) => {
+        const X = 60 + i * 370; box(X, 190, 340, 150, 24); x.fillStyle = "#fff5ea"; x.fill();
+        x.fillStyle = "#111a52"; x.font = '700 22px "Instrument Sans"'; x.fillText(k[0], X + 24, 230);
+        x.font = '56px "Bagel Fat One"'; x.fillText(k[1], X + 24, 305);
+      });
+      x.fillStyle = "#fff5ea"; x.font = '700 24px "Instrument Sans"'; x.fillText("Eggs by tier", 60, 392);
+      const tot = Math.max(1, ...TIERS.map(t => s.tiers[t.id] || 0)), cols = ["#ff9ec4", "#d6dbe8", "#ffd43b", "#bfe9ff"];
+      TIERS.forEach((t, i) => {
+        const Y = 408 + i * 46, n = s.tiers[t.id] || 0;
+        x.fillStyle = "#fff5ea"; x.font = '700 24px "Instrument Sans"'; x.fillText(t.n, 60, Y + 28);
+        box(260, Y + 6, 720, 28, 14); x.fillStyle = "#1b2770"; x.fill();
+        if(n){ box(260, Y + 6, Math.max(28, 720 * n / tot), 28, 14); x.fillStyle = cols[i]; x.fill(); }
+        x.fillStyle = "#fff5ea"; x.textAlign = "right"; x.fillText(n.toLocaleString(), 1080, Y + 28); x.textAlign = "left";
+      });
+      x.fillStyle = "#ff9ec4"; x.font = '44px "Bagel Fat One"'; x.fillText("$EVOLVE", 60, 650);
+      x.fillStyle = "#cfd4f5"; x.font = '700 22px "Instrument Sans"'; x.textAlign = "right"; x.fillText(location.host, 1140, 645); x.textAlign = "left";
+      const blob = await new Promise(ok => c.toBlob(ok, "image/png"));
+      const file = new File([blob], "evolve-hatchery-stats.png", {type:"image/png"});
+      const text = `hatchery update: ${s.hatched.toLocaleString()} creatures hatched, ${s.finals.toLocaleString()} final forms pulled. $EVOLVE ${location.origin}`;
+      if(navigator.canShare && navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file], text}); }catch(e){} }
+      else {
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+        window.open("https://x.com/intent/post?text=" + encodeURIComponent(text), "_blank", "noopener");
+        $("statsMsg").textContent = "Card saved. Attach it to your post.";
+      }
+    }catch(e){ $("statsMsg").textContent = "Couldn't make the card. Try again."; }
+    btn.disabled = false; btn.textContent = "Share hatchery stats";
+  }
+  $("statsBtn").addEventListener("click", shareStats);
 
   /* ---------- start ---------- */
   (async () => {
